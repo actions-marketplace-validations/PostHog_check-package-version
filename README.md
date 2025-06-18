@@ -31,7 +31,7 @@ All inputs are **optional**. If not set, sensible defaults will be used.
 | Name                  | Description                                        | Default |
 | --------------------- | -------------------------------------------------- | ------- |
 | `path`                | Path to the npm package                            | `.`     |
-| `allow-first-version` | Allow publishing 0.0.0 version if not found on npm | `false` |
+| `allow-first-version` | Allow publishing 1.0.0 version if not found on npm | `false` |
 
 ### Action outputs
 
@@ -42,7 +42,7 @@ The following outputs can be used by subsequent workflow steps.
 | `committed-version` | Version now commited to the repo                                                                                                      |
 | `published-version` | Latest version published to npm, based on `dist-tags`. It will not be set for first version                                           |
 | `is-new-version`    | Whether repo version is newer than npm version or is the first version (version has not been published before), `'true'` or `'false'` |
-| `is-first-version`  | Whether repo version is new to npm (has not been published before and version is 0.0.0), `'true'` or `'false'`                        |
+| `is-first-version`  | Whether repo version is new to npm (has not been published before and version is 1.0.0), `'true'` or `'false'`                        |
 
 ### Workflow example
 
