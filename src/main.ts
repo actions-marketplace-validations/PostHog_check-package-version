@@ -39,7 +39,7 @@ async function run(): Promise<void> {
             core.setOutput('published-version', packageNpm['dist-tags'].latest)
             core.setOutput('committed-version', packageFile.version)
         } catch (err: unknown) {
-            if (err instanceof PackageNotFoundError && allowFirstVersion && packageFile.version === '1.0.0') {
+            if (err instanceof PackageNotFoundError && allowFirstVersion) {
                 core.setOutput('is-first-version', 'true')
                 core.setOutput('is-new-version', 'true')
                 core.setOutput('committed-version', packageFile.version)

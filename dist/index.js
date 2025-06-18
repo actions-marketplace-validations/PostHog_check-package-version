@@ -75,7 +75,7 @@ function run() {
                 core.setOutput('committed-version', packageFile.version);
             }
             catch (err) {
-                if (err instanceof package_json_1.PackageNotFoundError && allowFirstVersion && packageFile.version === '1.0.0') {
+                if (err instanceof package_json_1.PackageNotFoundError && allowFirstVersion) {
                     core.setOutput('is-first-version', 'true');
                     core.setOutput('is-new-version', 'true');
                     core.setOutput('committed-version', packageFile.version);
