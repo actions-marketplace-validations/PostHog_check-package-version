@@ -28,19 +28,21 @@ By [PostHog](https://posthog.com).
 
 All inputs are **optional**. If not set, sensible defaults will be used.
 
-| Name   | Description             | Default |
-| ------ | ----------------------- | ------- |
-| `path` | Path to the npm package | `.`     |
+| Name                  | Description                                        | Default |
+| --------------------- | -------------------------------------------------- | ------- |
+| `path`                | Path to the npm package                            | `.`     |
+| `allow-first-version` | Allow publishing 0.0.0 version if not found on npm | `false` |
 
 ### Action outputs
 
 The following outputs can be used by subsequent workflow steps.
 
-| Name                | Description                                                                               |
-| ------------------- | ----------------------------------------------------------------------------------------- |
-| `committed-version` | Version now commited to the repo                                                          |
-| `published-version` | Latest version published to npm, based on `dist-tags`                                     |
-| `is-new-version`    | Whether repo version is new to npm (has not been published before), `'true'` or `'false'` |
+| Name                | Description                                                                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `committed-version` | Version now commited to the repo                                                                                                      |
+| `published-version` | Latest version published to npm, based on `dist-tags`. It will not be set for first version                                           |
+| `is-new-version`    | Whether repo version is newer than npm version or is the first version (version has not been published before), `'true'` or `'false'` |
+| `is-first-version`  | Whether repo version is new to npm (has not been published before and version is 0.0.0), `'true'` or `'false'`                        |
 
 ### Workflow example
 
@@ -66,6 +68,8 @@ jobs:
             - name: Check package version
               id: cpv
               uses: PostHog/check-package-version@v2
+              with:
+                  allow-first-version: true
 
             - name: Echo versions
               run: |
