@@ -33,7 +33,7 @@ async function run(): Promise<void> {
         core.debug(`Fetching package ${packageFile.name} information from npm…`)
         try {
             const packageNpm = await packageJson(packageFile.name, { allVersions: true })
-            const isNewVersion = !Object.keys(packageNpm.versions).includes(packageFile.version)
+            const isNewVersion = !Object.hasOwn(packageNpm.versions, packageFile.version)
             core.setOutput('is-new-version', isNewVersion.toString())
             core.setOutput('is-first-version', 'false')
             core.setOutput('published-version', packageNpm['dist-tags'].latest)
