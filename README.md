@@ -39,7 +39,7 @@ The following outputs can be used by subsequent workflow steps.
 
 | Name                | Description                                                                                        |
 | ------------------- | -------------------------------------------------------------------------------------------------- |
-| `committed-version` | Version now commited to the repo                                                                   |
+| `committed-version` | Version now committed to the repo                                                                  |
 | `published-version` | Latest version published to npm, based on `dist-tags` (this won't be set for the first version)    |
 | `is-new-version`    | Whether repo version is newer than npm version (or package does not exists), `'true'` or `'false'` |
 | `is-first-version`  | Whether repo package does not exist on npm, `'true'` or `'false'`                                  |
