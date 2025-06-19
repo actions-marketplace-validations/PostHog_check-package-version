@@ -34,13 +34,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.readPackageFile = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-const package_json_1 = __importDefault(__nccwpck_require__(9664));
+const package_json_1 = __importStar(__nccwpck_require__(9664));
 const path = __importStar(__nccwpck_require__(5622));
 const fs = __importStar(__nccwpck_require__(5747));
 function readPackageFile(packagePath) {
@@ -65,17 +62,36 @@ exports.readPackageFile = readPackageFile;
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const packagePath = core.getInput('path') || '.';
+            const packagePath = core.getInput('path');
+            const failOnNewPackage = core.getBooleanInput('fail-on-new-package');
             const packageFile = yield readPackageFile(packagePath);
             core.debug(`Fetching package ${packageFile.name} information from npm…`);
-            const packageNpm = yield package_json_1.default(packageFile.name, { allVersions: true });
-            const isNewVersion = !Object.keys(packageNpm.versions).includes(packageFile.version);
-            core.setOutput('is-new-version', isNewVersion.toString());
-            core.setOutput('published-version', packageNpm['dist-tags'].latest);
-            core.setOutput('committed-version', packageFile.version);
+            try {
+                const packageNpm = yield package_json_1.default(packageFile.name, { allVersions: true });
+                const isNewVersion = !(packageFile.version in packageNpm.versions);
+                core.setOutput('is-new-version', isNewVersion.toString());
+                core.setOutput('is-new-package', 'false');
+                core.setOutput('published-version', packageNpm['dist-tags'].latest);
+                core.setOutput('committed-version', packageFile.version);
+            }
+            catch (err) {
+                if (err instanceof package_json_1.PackageNotFoundError && !failOnNewPackage) {
+                    core.setOutput('is-new-package', 'true');
+                    core.setOutput('is-new-version', 'true');
+                    core.setOutput('committed-version', packageFile.version);
+                }
+                else {
+                    throw err;
+                }
+            }
         }
         catch (error) {
-            core.setFailed(error.message);
+            if (error instanceof Error) {
+                core.setFailed(error.message);
+            }
+            else {
+                core.setFailed('An unknown error occurred');
+            }
         }
     });
 }

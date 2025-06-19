@@ -28,19 +28,21 @@ By [PostHog](https://posthog.com).
 
 All inputs are **optional**. If not set, sensible defaults will be used.
 
-| Name   | Description             | Default |
-| ------ | ----------------------- | ------- |
-| `path` | Path to the npm package | `.`     |
+| Name                  | Description                           | Default |
+| --------------------- | ------------------------------------- | ------- |
+| `path`                | Path to the npm package               | `.`     |
+| `fail-on-new-package` | Whether to fail if the package is new | `false` |
 
 ### Action outputs
 
 The following outputs can be used by subsequent workflow steps.
 
-| Name                | Description                                                                               |
-| ------------------- | ----------------------------------------------------------------------------------------- |
-| `committed-version` | Version now commited to the repo                                                          |
-| `published-version` | Latest version published to npm, based on `dist-tags`                                     |
-| `is-new-version`    | Whether repo version is new to npm (has not been published before), `'true'` or `'false'` |
+| Name                | Description                                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------------------- |
+| `committed-version` | Version now committed to the repo                                                                  |
+| `published-version` | Latest version published to npm, based on `dist-tags` (this won't be set for new packages)         |
+| `is-new-version`    | Whether repo version is newer than npm version (or package does not exists), `'true'` or `'false'` |
+| `is-new-package`    | Whether repo package has not been published yet (`"true"` or `"false"`)                            |
 
 ### Workflow example
 

@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import packageJson from 'package-json'
+import packageJson, { PackageNotFoundError } from 'package-json'
 import * as path from 'path'
 import * as fs from 'fs'
 
@@ -27,16 +27,32 @@ export async function readPackageFile(packagePath: string): Promise<PackageFile>
 
 async function run(): Promise<void> {
     try {
-        const packagePath = core.getInput('path') || '.'
+        const packagePath = core.getInput('path')
+        const failOnNewPackage = core.getBooleanInput('fail-on-new-package')
         const packageFile = await readPackageFile(packagePath)
         core.debug(`Fetching package ${packageFile.name} information from npm…`)
-        const packageNpm = await packageJson(packageFile.name, { allVersions: true })
-        const isNewVersion = !Object.keys(packageNpm.versions).includes(packageFile.version)
-        core.setOutput('is-new-version', isNewVersion.toString())
-        core.setOutput('published-version', packageNpm['dist-tags'].latest)
-        core.setOutput('committed-version', packageFile.version)
-    } catch (error) {
-        core.setFailed(error.message)
+        try {
+            const packageNpm = await packageJson(packageFile.name, { allVersions: true })
+            const isNewVersion = !(packageFile.version in packageNpm.versions)
+            core.setOutput('is-new-version', isNewVersion.toString())
+            core.setOutput('is-new-package', 'false')
+            core.setOutput('published-version', packageNpm['dist-tags'].latest)
+            core.setOutput('committed-version', packageFile.version)
+        } catch (err: unknown) {
+            if (err instanceof PackageNotFoundError && !failOnNewPackage) {
+                core.setOutput('is-new-package', 'true')
+                core.setOutput('is-new-version', 'true')
+                core.setOutput('committed-version', packageFile.version)
+            } else {
+                throw err
+            }
+        }
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            core.setFailed(error.message)
+        } else {
+            core.setFailed('An unknown error occurred')
+        }
     }
 }
 
