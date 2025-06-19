@@ -28,10 +28,10 @@ By [PostHog](https://posthog.com).
 
 All inputs are **optional**. If not set, sensible defaults will be used.
 
-| Name                  | Description                                            | Default |
-| --------------------- | ------------------------------------------------------ | ------- |
-| `path`                | Path to the npm package                                | `.`     |
-| `allow-first-version` | Do not raise an error when package is not found on npm | `false` |
+| Name                  | Description                           | Default |
+| --------------------- | ------------------------------------- | ------- |
+| `path`                | Path to the npm package               | `.`     |
+| `fail-on-new-package` | Whether to fail if the package is new | `false` |
 
 ### Action outputs
 
@@ -40,9 +40,9 @@ The following outputs can be used by subsequent workflow steps.
 | Name                | Description                                                                                        |
 | ------------------- | -------------------------------------------------------------------------------------------------- |
 | `committed-version` | Version now committed to the repo                                                                  |
-| `published-version` | Latest version published to npm, based on `dist-tags` (this won't be set for the first version)    |
+| `published-version` | Latest version published to npm, based on `dist-tags` (this won't be set for new packages)         |
 | `is-new-version`    | Whether repo version is newer than npm version (or package does not exists), `'true'` or `'false'` |
-| `is-first-version`  | Whether repo package does not exist on npm, `'true'` or `'false'`                                  |
+| `is-new-package`    | Whether repo package has not been published yet (`"true"` or `"false"`)                            |
 
 ### Workflow example
 
@@ -68,8 +68,6 @@ jobs:
             - name: Check package version
               id: cpv
               uses: PostHog/check-package-version@v2
-              with:
-                  allow-first-version: true
 
             - name: Echo versions
               run: |

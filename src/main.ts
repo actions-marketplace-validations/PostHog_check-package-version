@@ -27,20 +27,20 @@ export async function readPackageFile(packagePath: string): Promise<PackageFile>
 
 async function run(): Promise<void> {
     try {
-        const packagePath = core.getInput('path') || '.'
-        const allowFirstVersion = core.getInput('allow-first-version') === 'true'
+        const packagePath = core.getInput('path')
+        const failOnNewPackage = core.getBooleanInput('fail-on-new-package')
         const packageFile = await readPackageFile(packagePath)
         core.debug(`Fetching package ${packageFile.name} information from npm…`)
         try {
             const packageNpm = await packageJson(packageFile.name, { allVersions: true })
-            const isNewVersion = !Object.hasOwn(packageNpm.versions, packageFile.version)
+            const isNewVersion = !(packageFile.version in packageNpm.versions)
             core.setOutput('is-new-version', isNewVersion.toString())
-            core.setOutput('is-first-version', 'false')
+            core.setOutput('is-new-package', 'false')
             core.setOutput('published-version', packageNpm['dist-tags'].latest)
             core.setOutput('committed-version', packageFile.version)
         } catch (err: unknown) {
-            if (err instanceof PackageNotFoundError && allowFirstVersion) {
-                core.setOutput('is-first-version', 'true')
+            if (err instanceof PackageNotFoundError && !failOnNewPackage) {
+                core.setOutput('is-new-package', 'true')
                 core.setOutput('is-new-version', 'true')
                 core.setOutput('committed-version', packageFile.version)
             } else {

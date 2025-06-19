@@ -62,21 +62,21 @@ exports.readPackageFile = readPackageFile;
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const packagePath = core.getInput('path') || '.';
-            const allowFirstVersion = core.getInput('allow-first-version') === 'true';
+            const packagePath = core.getInput('path');
+            const failOnNewPackage = core.getBooleanInput('fail-on-new-package');
             const packageFile = yield readPackageFile(packagePath);
             core.debug(`Fetching package ${packageFile.name} information from npm…`);
             try {
                 const packageNpm = yield package_json_1.default(packageFile.name, { allVersions: true });
-                const isNewVersion = !Object.keys(packageNpm.versions).includes(packageFile.version);
+                const isNewVersion = !(packageFile.version in packageNpm.versions);
                 core.setOutput('is-new-version', isNewVersion.toString());
-                core.setOutput('is-first-version', 'false');
+                core.setOutput('is-new-package', 'false');
                 core.setOutput('published-version', packageNpm['dist-tags'].latest);
                 core.setOutput('committed-version', packageFile.version);
             }
             catch (err) {
-                if (err instanceof package_json_1.PackageNotFoundError && allowFirstVersion) {
-                    core.setOutput('is-first-version', 'true');
+                if (err instanceof package_json_1.PackageNotFoundError && !failOnNewPackage) {
+                    core.setOutput('is-new-package', 'true');
                     core.setOutput('is-new-version', 'true');
                     core.setOutput('committed-version', packageFile.version);
                 }
